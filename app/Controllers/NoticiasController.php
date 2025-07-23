@@ -7,15 +7,54 @@ use App\Models\ImagemModel;
 use App\Models\PostagemModel;
 use App\Models\UsuarioModel;
 use CodeIgniter\Database\RawSql;
+use CodeIgniter\Exceptions\PageNotFoundException;
 use Config\Paths;
+use Exception;
 
 class NoticiasController extends BaseController
 {
     public function index()
     {
-        return view('Admin/tabelaNoticias', [
-            'title' => 'Painel Administrativo - Noticias', 'url' => 'painel adm.', 'paths' => new Paths
-        ]);
+        $tabelaUsuario = new UsuarioModel();
+        $tabelaPostagem = new PostagemModel();
+        $tabelaImagem = new ImagemModel();
+
+        try {
+
+            $tabelaUsuario->transException(true)->transStart();
+            $tabelaPostagem->transException(true)->transStart();
+            $tabelaImagem->transException(true)->transStart();
+
+            $listaPostagem = $tabelaPostagem->select()->orderBy('id_postagem', 'DESC')->get()->getResult();
+
+            $listaObjetoImagemCapa = [];
+            $listaCriadoPor = [];
+        
+            foreach ($listaPostagem as $postagem) {
+                if (mb_strlen($postagem->titulo, 'UTF-8') > 30) {
+                    $postagem->titulo = mb_substr($postagem->titulo, 0, 30, 'UTF-8') . '...';
+                }
+                if (mb_strlen($postagem->corpo_noticia, 'UTF-8') > 60) {
+                    $postagem->corpo_noticia = mb_substr($postagem->corpo_noticia, 0, 60, 'UTF-8') . '...';
+                }
+                $criadoPor = $tabelaUsuario->where('id_usuario', $postagem->criado_por)->select('nome')->get()->getRow()->nome;
+                array_push($listaCriadoPor, $criadoPor);
+            }
+            $tabelaUsuario->transComplete();
+            $tabelaPostagem->transComplete();
+            return view('Admin/tabelaNoticias', [
+                'title' => 'Painel Administrativo - Noticias', 
+                'url' => 'painel adm.',
+                'listaPostagem' => $listaPostagem, 
+                'listaCriadoPor' => $listaCriadoPor
+            ]);
+
+        } catch (Exception $e) {
+
+            // var_dump($e);
+            throw new PageNotFoundException();
+
+        }
     }
 
     
@@ -109,53 +148,16 @@ class NoticiasController extends BaseController
             return redirect()->route('admin.noticias.show.success');
         }
 
-        // var_dump($tabelaImagem->select()->get()->getResult());
-        // $resultado = $tabelaImagem->where('id_imagem', 9)->select()->get()->getRow();
+    }
 
-        // header("Content-Type: {$resultado->tipo}");
-        // header("Content-Disposition: attachment; filename=\"{$resultado[0]->nome}\"");
-
-        // echo $resultado->dados;
-
-        // return view('teste', ['img' => base64_encode( $resultado->dados), 'tipo' => $resultado->tipo]);
-
-        // exit;
-
-        // var_dump($resultado[0]->tipo);
-
-        // var_dump($_FILES);
-
-        // echo $_FILES['name']
-        // echo "<img src='" . file_get_contents($img->getTempName()) . ".jpg'>";
-        // header("Content-Type: {$img->getExtension()}");
-        // header("Content-Disposition: attachment; filename=\"{$img->getName()}\"");
-        // echo img_data(file_get_contents($img->getTempName()), 'jpg');
-
-        // var_dump($tabelaImagem->select()->get()->getResult());
-
-        // $tabelaUsuario->transStart();
-        // var_dump($tabelaUsuario->select()->get()->getResult());
-        // var_dump($tabelaUsuario->transStatus());
-        // var_dump($this->request->getPost('img-capa'));
-        // $img = $this->request->getFile('img-capa');
-        // // var_dump($img->getName());
-        // // var_dump($img);
-        // // var_dump(getcwd());
-
-        // $files = $this->request->getFiles();
-        // var_dump($files);
-        // // var_dump($img->get());
-        // echo $img;
-        // 
-        // // var_dump($img->getExtension());
-        // // echo file($this->request->getPost('img-capa'));
-        // // filesize($this->request->getPost('img-capa'));
-        // // var_dump(is_file($this->request->getFile('img-capa')));
-        // $tabelaUsuario->query('ANOTHER QUERY...');
-        // $tabelaUsuario->transComplete();
-
-        // if ($tabelaUsuario->transStatus() === false) {
-        //     // generate an error... or use the log_message() function to log your error
-        // }
+        public function destroy($indice)
+    {?>
+        <script>
+            resposta = confirm('Tem certeza de que deseja excluir essa notícia?')
+        </script>
+        <?php
+        return view('Admin/publicarNoticia', [
+            'title' => 'Painel Administrativo - Publicar noticia', 'url' => 'painel adm.', 'paths' => new Paths
+        ]);
     }
 }
