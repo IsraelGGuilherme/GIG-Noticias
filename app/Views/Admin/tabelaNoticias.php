@@ -11,6 +11,16 @@
 
 <?= $this->section('content') ?>
 
+    <?php if (session()->has('resultadoDelete')): ?>
+
+        <div class="alert alert-<?= session('resultadoDelete')['resultado'] ?> my-3 alert-dismissible fade show" role="alert">
+            <?= session('resultadoDelete')['msg'] ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+    <?php endif; ?>
+
+
     <a href="<?= url_to('admin.noticias.create') ?>">Criar Noticia</a>
 
     <table id="tabela-noticias" class="table table-striped table-hover">

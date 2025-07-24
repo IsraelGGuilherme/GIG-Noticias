@@ -22,10 +22,13 @@
 
     <div class="d-flex">
 
-        <div class="flex-grow-1 text-center d-grid p-3 ps-0">
-            <a href="<?= url_to('admin')?>" class="btn btn-secondary" type="button">Página Inicial</a>
+            <div class="flex-grow-1 text-center d-grid p-3 ps-0">
+        <a href="<?= url_to('admin')?>" class="btn btn-secondary" type="button">Página Inicial</a>
         </div>
-        <div <?= $msg == 'error' ? 'class="flex-grow-1 text-center d-grid p-3 d-none"' : 'class="flex-grow-1 text-center d-grid p-3"'?> >
+        <div class="flex-grow-1 text-center d-grid p-3 ps-0">
+            <a href="<?= url_to('admin.noticias')?>" class="btn btn-secondary" type="button">Voltar</a>
+        </div>
+        <div <?= $msg == 'error' ? 'class="flex-grow-1 text-center d-grid py-3 d-none"' : 'class="flex-grow-1 text-center d-grid py-3"'?> >
             <a href="<?= url_to('noticia.show', 'ultimo')?>" class="btn btn-secondary" type="button">Visualizar notícia</a>
         </div>
         <div class="flex-grow-1 text-center d-grid p-3 pe-0">

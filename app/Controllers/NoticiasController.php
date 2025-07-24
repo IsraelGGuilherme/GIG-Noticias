@@ -25,9 +25,8 @@ class NoticiasController extends BaseController
             $tabelaPostagem->transException(true)->transStart();
             $tabelaImagem->transException(true)->transStart();
 
-            $listaPostagem = $tabelaPostagem->select()->orderBy('id_postagem', 'DESC')->get()->getResult();
+            $listaPostagem = $tabelaPostagem->select()->get()->getResult();
 
-            $listaObjetoImagemCapa = [];
             $listaCriadoPor = [];
         
             foreach ($listaPostagem as $postagem) {
@@ -51,8 +50,8 @@ class NoticiasController extends BaseController
 
         } catch (Exception $e) {
 
-            // var_dump($e);
-            throw new PageNotFoundException();
+            var_dump($e);
+            // throw new PageNotFoundException();
 
         }
     }
@@ -151,13 +150,46 @@ class NoticiasController extends BaseController
     }
 
         public function destroy($indice)
-    {?>
-        <script>
-            resposta = confirm('Tem certeza de que deseja excluir essa notícia?')
-        </script>
-        <?php
-        return view('Admin/publicarNoticia', [
-            'title' => 'Painel Administrativo - Publicar noticia', 'url' => 'painel adm.', 'paths' => new Paths
-        ]);
+    {
+        $tabelaPostagem = new PostagemModel();
+        $tabelaImagem = new ImagemModel();
+
+        try {
+            $tabelaPostagem->transException(true)->transStart();
+            $tabelaImagem->transException(true)->transStart();
+
+            $idImagemCapa = $tabelaPostagem->where('id_postagem', $indice)->select('id_imagem_capa')->get()->getRow()->id_imagem_capa;
+
+            $deletado = $tabelaImagem->where('id_imagem', $idImagemCapa)->delete();
+        
+            $tabelaPostagem->transComplete();
+            $tabelaImagem->transComplete();
+
+            if ($deletado) {
+                $resultadoDelete = [
+                    'resultado' => 'success',
+                    'msg' => 'Registro Apagado com sucesso'
+                ];
+            } else {
+                $resultadoDelete = [
+                    'resultado' => 'danger',
+                    'msg' => 'Ocorreu um erro ao apagar o registro'
+                ];
+            }
+            session()->setTempdata('resultadoDelete', $resultadoDelete, 5);
+            var_dump(session('resultadoDelete'));
+            return redirect()->route('admin.noticias');
+
+        } catch (Exception $e) {
+
+            session()->setTempdata(
+                'resultadoDelete', [
+                    'resultado' => 'danger',
+                    'msg' => 'Ocorreu um erro ao apagar o registro'
+                ], 5
+            );
+            return redirect()->route('admin.noticias');
+
+        }
     }
 }
