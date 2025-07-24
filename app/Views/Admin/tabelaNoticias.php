@@ -59,7 +59,7 @@
                             </a>
                         </td>
                         <td>
-                            <a class="btn btn-warning text-light" href="<?= url_to('admin.noticias.destroy', $postagem->id_postagem) ?>">
+                            <a class="btn btn-warning text-light" href="<?= url_to('admin.noticias.edit', $postagem->id_postagem) ?>">
                                 Editar
                             </a>
                         </td>

@@ -6,16 +6,10 @@
 
 <?= $this->section('content') ?>
 
-    <?php if ($msg == 'error'): ?>
+    <?php if (session()->has('msgNoticiaShowResultado')): ?>
 
-        <div class="alert alert-danger mt-3" role="alert">
-            Ocorreu um erro ao enviar a notícia
-        </div>
-
-    <?php else: ?>
-
-        <div class="alert alert-success mt-3" role="alert">
-            Notícia enviada com sucesso
+        <div class="alert alert-<?= $bgStyle == 'success' ? 'success': 'danger' ?> mt-3" role="alert">
+            <?= session()->get('msgNoticiaShowResultado') ?>
         </div>
 
     <?php endif; ?>
@@ -28,8 +22,8 @@
         <div class="flex-grow-1 text-center d-grid p-3 ps-0">
             <a href="<?= url_to('admin.noticias')?>" class="btn btn-secondary" type="button">Voltar</a>
         </div>
-        <div <?= $msg == 'error' ? 'class="flex-grow-1 text-center d-grid py-3 d-none"' : 'class="flex-grow-1 text-center d-grid py-3"'?> >
-            <a href="<?= url_to('noticia.show', 'ultimo')?>" class="btn btn-secondary" type="button">Visualizar notícia</a>
+        <div <?= $bgStyle == 'error' ? 'class="flex-grow-1 text-center d-grid py-3 d-none"' : 'class="flex-grow-1 text-center d-grid py-3"'?> >
+            <a href="<?= url_to('noticia.show', $indice)?>" class="btn btn-secondary" type="button">Visualizar notícia</a>
         </div>
         <div class="flex-grow-1 text-center d-grid p-3 pe-0">
             <a href="<?= url_to('admin.noticias.create')?>" class="btn btn-primary" type="button">Cadastrar Nova Notícia</a>

@@ -23,7 +23,7 @@
             <div>
                 <label for="txt-noticia" class="form-label">Texto da noticia</label>
                 <textarea name="txt-noticia" id="txt-noticia" rows="10" cols="80">
-                    This is my textarea to be replaced with CKEditor 4.
+                    Digite aqui a notícia
                 </textarea>
                 <script>
                     CKEDITOR.replace('txt-noticia');
