@@ -25,7 +25,9 @@ class EstaLogadoFilter implements FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
-        //
+        if (! session()->has('user')) {
+            return redirect()->route('login');
+        }
     }
 
     /**

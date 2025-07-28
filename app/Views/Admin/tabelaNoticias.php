@@ -20,8 +20,9 @@
 
     <?php endif; ?>
 
-
-    <a href="<?= url_to('admin.noticias.create') ?>">Criar Noticia</a>
+    <div class="d-grid gap-2 my-3">
+        <a class="btn btn-primary" href="<?= url_to('admin.noticias.create') ?>">Criar Noticia</a>
+    </div>
 
     <table id="tabela-noticias" class="table table-striped table-hover">
         <thead>
@@ -92,7 +93,9 @@
                     url: "https://cdn.datatables.net/plug-ins/2.0.0/i18n/pt-BR.json",
                 },
                 paging: true,
-                pageLength: 10
+                pageLength: 10,
+                scrollX: true,
+                order: [[0, 'desc']]
             });
         });
     </script>

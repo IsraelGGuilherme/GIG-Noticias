@@ -121,7 +121,7 @@ class NoticiasController extends BaseController
 
             $userEmail = session('user')->email;
 
-            $userId = $tabelaUsuario->where('email', '$userEmail')->select('id_usuario')->get()->getRow()->id_usuario;
+            $userId = $tabelaUsuario->where('email', $userEmail)->select('id_usuario')->get()->getRow()->id_usuario;
 
             $img = $this->request->getFile('img-capa');
             $idImagemCapa = $tabelaImagem->insert([
@@ -183,7 +183,7 @@ class NoticiasController extends BaseController
             $tabelaImagem->transComplete();
             return view('Admin/editarNoticia', [
                 'title' => $postagem->titulo,
-                'url' => 'home', 
+                'url' => 'painel adm.', 
                 'postagem' => $postagem, 
                 'img' => $objetoImagemCapa,
                 'criadoPor' => $criadoPor
@@ -214,79 +214,103 @@ class NoticiasController extends BaseController
 
         $imagemCapaTrocada = request()->getFile('img-capa')->getError() == 4 ? false : true;
 
-        if ($imagemCapaTrocada) {
-            $validationData = $this->validateData([], [
-                'img-capa' => [
-                    'label' => 'Este',
-                    'rules' => [
-                        'uploaded[img-capa]',
-                        'is_image[img-capa]',
-                        'mime_in[img-capa,image/jpg,image/jpeg,image/png]',
-                        'max_size[img-capa,50000]',
+        try {
+            if ($imagemCapaTrocada) {
+                $validationData = $this->validateData([], [
+                    'img-capa' => [
+                        'label' => 'Este',
+                        'rules' => [
+                            'uploaded[img-capa]',
+                            'is_image[img-capa]',
+                            'mime_in[img-capa,image/jpg,image/jpeg,image/png]',
+                            'max_size[img-capa,50000]',
+                        ],
                     ],
-                ],
-            ]);
+                ]);
 
-            if (! $validated || ! $validationData) {
-                return redirect()->back()->with('errors', $this->validator->getErrors());
-            }
-        } else {
-            if (! $validated) {
-                return redirect()->back()->with('errors', $this->validator->getErrors());
-            }
-            $tabelaUsuario = new UsuarioModel();
-            // $tabelaImagem = new ImagemModel();
-            $tabelaPostagem = new PostagemModel();
+                if (! $validated || ! $validationData) {
+                    return redirect()->back()->with('errors', $this->validator->getErrors());
+                }
 
-            $tabelaUsuario->transBegin();
-            // $tabelaImagem->transBegin();
-            $tabelaPostagem->transBegin();
+                $tabelaUsuario = new UsuarioModel();
+                $tabelaPostagem = new PostagemModel();
+                $tabelaImagem = new ImagemModel();
 
-            $userEmail = session('user')->email;
+                $tabelaUsuario->transException(true)->transStart();
+                $tabelaPostagem->transException(true)->transStart();
+                $tabelaImagem->transException(true)->transStart();
 
-            $userId = $tabelaUsuario->where('email', $userEmail)->select('id_usuario')->get()->getRow()->id_usuario;
+                $userEmail = session('user')->email;
 
-            // $img = $this->request->getFile('img-capa');
-            // $idImagemCapa = $tabelaImagem->insert([
-            //     'id_imagem'  => new RawSql('DEFAULT'),
-            //     'nome'       => $img->getName(),
-            //     'tipo'       => $img->getExtension(),
-            //     'dados'      => file_get_contents($img->getTempName())
-            // ]);
-            var_dump($indice);
-            $tabelaPostagem->where('id_postagem', $indice)->update($indice, [
-                'titulo'         => $this->request->getPost('txt-titulo'),
-                'corpo_noticia'  => $this->request->getPost('txt-noticia'),
-                'criado_por'     => $userId
-            ]);
+                $userId = $tabelaUsuario->where('email', $userEmail)->select('id_usuario')->get()->getRow()->id_usuario;
 
-            if (
-                ! $tabelaUsuario->transStatus() || 
-                // ! $tabelaImagem->transStatus() || 
-                ! $tabelaPostagem->transStatus()
-            ) {
-                $tabelaUsuario->transRollback();
-                // $tabelaImagem->transRollback();
-                $tabelaPostagem->transRollback();
+                $tabelaPostagem->update($indice, [
+                    'titulo'         => $this->request->getPost('txt-titulo'),
+                    'corpo_noticia'  => $this->request->getPost('txt-noticia'),
+                    'criado_por'     => $userId
+                ]);
+
+                $idImagemCapa = $tabelaPostagem->where('id_postagem', $indice)->select('id_imagem_capa')->get()->getRow()->id_imagem_capa;
+
+                $img = $this->request->getFile('img-capa');
+
+                $idImagemCapa = $tabelaImagem->update($idImagemCapa, [
+                    'nome'       => $img->getName(),
+                    'tipo'       => $img->getExtension(),
+                    'dados'      => file_get_contents($img->getTempName())
+                ]);
+
+                $tabelaUsuario->transComplete();
+                $tabelaPostagem->transComplete();
+                $tabelaImagem->transComplete();
+
                 session()->setTempdata(
-                    'msgNoticiaShowResultado', 'Ocorreu um erro ao atualizar a imagem', 5
+                    'msgNoticiaShowResultado', 'A notícia foi atualizada com sucesso', 5
                 );
                 return redirect()->route('admin.noticias.show.2p', [
-                    'error', $indice
+                    'success', $indice
                 ]);
             } else {
-                $tabelaUsuario->transCommit();
-                // $tabelaImagem->transCommit();
-                $tabelaPostagem->transCommit();
+                if (! $validated) {
+                    return redirect()->back()->with('errors', $this->validator->getErrors());
+                }
+                $tabelaUsuario = new UsuarioModel();
+                $tabelaPostagem = new PostagemModel();
+
+                $tabelaUsuario->transException(true)->transStart();
+                $tabelaPostagem->transException(true)->transStart();
+
+                $userEmail = session('user')->email;
+
+                $userId = $tabelaUsuario->where('email', $userEmail)->select('id_usuario')->get()->getRow()->id_usuario;
+
+                $tabelaPostagem->where('id_postagem', $indice)->update($indice, [
+                    'titulo'         => $this->request->getPost('txt-titulo'),
+                    'corpo_noticia'  => $this->request->getPost('txt-noticia'),
+                    'criado_por'     => $userId
+                ]);
+
+                $tabelaUsuario->transComplete();
+                $tabelaPostagem->transComplete();
+
                 session()->setTempdata(
-                    'msgNoticiaShowResultado', 'A imagem foi atualizada com sucesso', 5
+                    'msgNoticiaShowResultado', 'A notícia foi atualizada com sucesso', 5
                 );
-                return redirect()->route('admin.noticias.show.1p', [
+                return redirect()->route('admin.noticias.show.2p', [
                     'success', $indice
                 ]);
             }
+
+        } catch (Exception $e) {
+
+            session()->setTempdata(
+                'msgNoticiaShowResultado', 'Ocorreu um erro ao atualizar a notícia', 5
+            );
+            return redirect()->route('admin.noticias.show.2p', [
+                'error', $indice
+            ]);
+
         }
-die();
     }
 
     public function destroy($indice)

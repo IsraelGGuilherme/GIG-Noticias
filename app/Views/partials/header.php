@@ -26,7 +26,7 @@
                     </div>
                 </form>
                 <a class="d-grid gap-2 text-decoration-none" href="<?= (session()->has('user') ? (url_to('login.destroy')) : (url_to('login'))) ?>">
-                    <button style="background-color: white; display: block;" class="btn btn-light " type="submit">
+                    <button style="background-color: white; display: block;" class="btn btn-light " type="submit" <?= session()->has('user') ? 'onclick="return resposta = confirm(\'Tem certeza de que deseja sair?\')"' : ''  ?>>
                         <?= session()->has('user') ? 'Logout' : 'Login'  ?>
                     </button>
                 </a>               

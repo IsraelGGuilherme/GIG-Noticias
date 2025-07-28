@@ -16,8 +16,8 @@
 
         <div class="min-vh-100 d-flex flex-column">
             <?= $this->include('partials/header') ?>
-            <div class="row flex-grow-1 container-fluid">
-                <main class="col-9 order-1">
+            <div style="max-width: 100%;" class="row flex-grow-1">
+                <main class="col-12 col-md-9 order-1 ">
                     <?= $this->renderSection('content') ?>
                 </main>
                 <?= $this->include('partials/adminAside') ?>

@@ -30,7 +30,7 @@
                 </script>
             </div>
             <p class="text-danger"><?= session()->getFlashdata('errors')['txt-noticia'] ?? '' ?></p>
-            <div>
+            <div class="d-none">
                 <label for="imgs-corpo" class="form-label">Imagens no fim da notícia</label>
                 <input class="form-control" type="file" id="imgs-corpo" name="imgs-corpo" accept="image/*" multiple>
             </div>
