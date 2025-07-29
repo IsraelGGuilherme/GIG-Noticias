@@ -8,11 +8,11 @@
         <h1><?= $postagem->titulo ?></h1>
     </div>
     <div>
-        <img class="w-100" src="<?= 'data:' , $img->tipo , ';base64,', base64_encode( $img->dados) ?>" alt="">
+        <img class="w-100" src="<?= 'data:' , $postagem->tipo , ';base64,', base64_encode($postagem->dados) ?>" alt="">
     </div>
     <div>
         <?= $postagem->corpo_noticia ?>
-        <p><strong>Por <?= $criadoPor ?></strong></p>
+        <p><strong>Por <?= $postagem->nome ?></strong></p>
     </div>
 
  </div>

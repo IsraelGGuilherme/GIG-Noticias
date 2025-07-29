@@ -17,12 +17,12 @@
             </div>
             <div>
                 <label for="img-capa" class="form-label">Capa da noticia</label>
-                <img id="img-capa-salvada" class="w-100" src="<?= 'data:' , $img->tipo , ';base64,', base64_encode( $img->dados) ?>" alt="">
+                <img id="img-capa-salvada" class="w-100" src="<?= 'data:' , $postagem->tipo , ';base64,', base64_encode($postagem->dados) ?>" alt="">
                 <div class="d-grid gap-2">
                     <button id="btn-trocar-imagem-capa" class="btn btn-danger" type="button" onclick="trocarImagemCapa()">Trocar Imagem da Capa da notícia</button>
                     <button id="btn-voltar-imagem-capa" class="btn btn-primary d-none" type="button" onclick="voltarImagemCapa()">Cancelar e voltar imagem da Capa da notícia</button>
                 </div>
-                <input class="form-control d-none" type="file" id="img-capa"  name="img-capa" accept="image/*" value="<?= 'data:' , $img->tipo , ';base64,', base64_encode( $img->dados) ?>">
+                <input class="form-control d-none" type="file" id="img-capa"  name="img-capa" accept="image/*">
                 <p class="text-danger"><?= session()->getFlashdata('errors')['img-capa'] ?? '' ?></p>
             </div>
             <div>

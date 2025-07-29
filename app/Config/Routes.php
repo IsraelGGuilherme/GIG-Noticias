@@ -26,5 +26,4 @@ $routes->group('admin', ['filter' => 'estaLogado'], static function ($routes) {
     $routes->get('blog', 'AdminController\Blog::index');
 });
 
-$routes->get('/elfinder', 'ElFinderController::index', ['as' => 'elFinder']);
 $routes->get('/teste', 'TesteController::index');

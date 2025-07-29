@@ -4,9 +4,6 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\UsuarioModel;
-use CodeIgniter\HTTP\ResponseInterface;
-use CodeIgniter\Session\Session;
-use CodeIgniter\Validation\Validation;
 
 class LoginController extends BaseController
 {
@@ -19,7 +16,6 @@ class LoginController extends BaseController
 
     public function store()
     {
-        // var_dump($this->request->getPost('email'));
         $validated = $this->validate([
             'email' => 'required|valid_email',
             'senha' => 'required',

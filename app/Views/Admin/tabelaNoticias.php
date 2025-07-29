@@ -56,7 +56,7 @@
                         </td>
                         <td>
                             <a class="text-decoration-none text-black" href="<?= url_to('noticia.show', $postagem->id_postagem) ?>">
-                                <?= $listaCriadoPor[$i] ?>
+                                <?= $postagem->nome ?>
                             </a>
                         </td>
                         <td>

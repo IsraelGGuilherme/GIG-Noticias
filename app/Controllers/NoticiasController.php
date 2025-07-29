@@ -8,29 +8,20 @@ use App\Models\PostagemModel;
 use App\Models\UsuarioModel;
 use CodeIgniter\Database\RawSql;
 use CodeIgniter\Exceptions\PageNotFoundException;
-use CodeIgniter\HTTP\Request;
 use Config\Paths;
 use Exception;
-
-use function PHPUnit\Framework\isEmpty;
 
 class NoticiasController extends BaseController
 {
     public function index()
     {
-        $tabelaUsuario = new UsuarioModel();
         $tabelaPostagem = new PostagemModel();
-        $tabelaImagem = new ImagemModel();
 
         try {
 
-            $tabelaUsuario->transException(true)->transStart();
-            $tabelaPostagem->transException(true)->transStart();
-            $tabelaImagem->transException(true)->transStart();
-
-            $listaPostagem = $tabelaPostagem->select()->get()->getResult();
-
-            $listaCriadoPor = [];
+            $listaPostagem = $tabelaPostagem->select('postagem.id_postagem, postagem.titulo, postagem.corpo_noticia, usuario.nome');
+            $listaPostagem->join('usuario', 'criado_por = id_usuario');
+            $listaPostagem = $listaPostagem->get()->getResult();
         
             foreach ($listaPostagem as $postagem) {
                 if (mb_strlen($postagem->titulo, 'UTF-8') > 30) {
@@ -39,28 +30,22 @@ class NoticiasController extends BaseController
                 if (mb_strlen($postagem->corpo_noticia, 'UTF-8') > 60) {
                     $postagem->corpo_noticia = mb_substr($postagem->corpo_noticia, 0, 60, 'UTF-8') . '...';
                 }
-                $criadoPor = $tabelaUsuario->where('id_usuario', $postagem->criado_por)->select('nome')->get()->getRow()->nome;
-                array_push($listaCriadoPor, $criadoPor);
             }
-            $tabelaUsuario->transComplete();
-            $tabelaPostagem->transComplete();
             return view('Admin/tabelaNoticias', [
                 'title' => 'Painel Administrativo - Noticias', 
                 'url' => 'painel adm.',
                 'listaPostagem' => $listaPostagem, 
-                'listaCriadoPor' => $listaCriadoPor
             ]);
 
         } catch (Exception $e) {
 
-            var_dump($e);
-            // throw new PageNotFoundException();
+            throw new PageNotFoundException();
 
         }
     }
 
     
-    public function show($bgStyle, $indice='ultimo')
+    public function show($bgStyle, $indice)
     {
         return view('Admin/showResultado', [
             'title' => 'Painel Administrativo - Noticias', 
@@ -115,8 +100,6 @@ class NoticiasController extends BaseController
 
         try {
 
-            $tabelaUsuario->transException(true)->transStart();
-            $tabelaPostagem->transException(true)->transStart();
             $tabelaImagem->transException(true)->transStart();
 
             $userEmail = session('user')->email;
@@ -139,9 +122,7 @@ class NoticiasController extends BaseController
                 'id_imagem_capa' => $idImagemCapa
             ]);
 
-            $tabelaUsuario->transComplete();
             $tabelaImagem->transComplete();
-            $tabelaPostagem->transComplete();
 
             session()->setTempdata(
                 'msgNoticiaShowResultado', 'Noticia salva com sucesso', 5
@@ -164,29 +145,20 @@ class NoticiasController extends BaseController
 
     public function edit($indice)
     {
-        $tabelaUsuario = new UsuarioModel();
         $tabelaPostagem = new PostagemModel();
-        $tabelaImagem = new ImagemModel();
 
         try {
 
-            $tabelaUsuario->transException(true)->transStart();
-            $tabelaPostagem->transException(true)->transStart();
-            $tabelaImagem->transException(true)->transStart();
-
-            $postagem = $tabelaPostagem->where('id_postagem', $indice)->select()->limit(1)->get()->getRow();
-            $idImagemCapa = $postagem->id_imagem_capa;
-            $objetoImagemCapa = $tabelaImagem->where('id_imagem', $idImagemCapa)->select()->get()->getRow();
-            $criadoPor = $tabelaUsuario->where('id_usuario', $postagem->criado_por)->select('nome')->get()->getRow()->nome;
-            $tabelaUsuario->transComplete();
-            $tabelaPostagem->transComplete();
-            $tabelaImagem->transComplete();
+            $postagem = $tabelaPostagem->where('id_postagem', $indice);
+            $postagem->select('postagem.id_postagem, postagem.titulo,postagem.corpo_noticia, usuario.nome, imagem.tipo, imagem.dados');
+            $postagem->join('usuario', 'criado_por = id_usuario');
+            $postagem->join('imagem', 'id_imagem_capa = id_imagem');
+            $postagem->limit(1);
+            $postagem = $postagem->get()->getRow();
             return view('Admin/editarNoticia', [
                 'title' => $postagem->titulo,
                 'url' => 'painel adm.', 
                 'postagem' => $postagem, 
-                'img' => $objetoImagemCapa,
-                'criadoPor' => $criadoPor
             ]);
 
         } catch (Exception $e) {
@@ -236,9 +208,7 @@ class NoticiasController extends BaseController
                 $tabelaPostagem = new PostagemModel();
                 $tabelaImagem = new ImagemModel();
 
-                $tabelaUsuario->transException(true)->transStart();
                 $tabelaPostagem->transException(true)->transStart();
-                $tabelaImagem->transException(true)->transStart();
 
                 $userEmail = session('user')->email;
 
@@ -260,9 +230,7 @@ class NoticiasController extends BaseController
                     'dados'      => file_get_contents($img->getTempName())
                 ]);
 
-                $tabelaUsuario->transComplete();
                 $tabelaPostagem->transComplete();
-                $tabelaImagem->transComplete();
 
                 session()->setTempdata(
                     'msgNoticiaShowResultado', 'A notícia foi atualizada com sucesso', 5
@@ -277,7 +245,6 @@ class NoticiasController extends BaseController
                 $tabelaUsuario = new UsuarioModel();
                 $tabelaPostagem = new PostagemModel();
 
-                $tabelaUsuario->transException(true)->transStart();
                 $tabelaPostagem->transException(true)->transStart();
 
                 $userEmail = session('user')->email;
@@ -290,7 +257,6 @@ class NoticiasController extends BaseController
                     'criado_por'     => $userId
                 ]);
 
-                $tabelaUsuario->transComplete();
                 $tabelaPostagem->transComplete();
 
                 session()->setTempdata(
@@ -320,14 +286,12 @@ class NoticiasController extends BaseController
 
         try {
             $tabelaPostagem->transException(true)->transStart();
-            $tabelaImagem->transException(true)->transStart();
 
             $idImagemCapa = $tabelaPostagem->where('id_postagem', $indice)->select('id_imagem_capa')->get()->getRow()->id_imagem_capa;
 
             $deletado = $tabelaImagem->where('id_imagem', $idImagemCapa)->delete();
         
             $tabelaPostagem->transComplete();
-            $tabelaImagem->transComplete();
 
             if ($deletado) {
                 $resultadoDelete = [

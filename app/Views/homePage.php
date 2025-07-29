@@ -18,7 +18,7 @@
                     <a href="<?= url_to('noticia.show', $noticia->id_postagem) ?>">
                         <div class="carousel-item <?= $indice == 0 ? 'active' : ''?>">
                             <div class="ratio ratio-16x9">
-                                <img src="<?='data:',  $listaImagemNoticiaCarrossel[$indice]->tipo , ';base64,', base64_encode($listaImagemNoticiaCarrossel[$indice]->dados) ?>" class="d-block w-100">
+                                <img src="<?='data:',  $noticia->tipo , ';base64,', base64_encode($noticia->dados) ?>" class="d-block w-100">
                             </div>
                             
                             <div class="carousel-caption d-none d-md-block">
@@ -52,7 +52,7 @@
                         <div class="col-12 col-md-5 order-2 order-sm-1">
 
                             <div class="ratio ratio-16x9">
-                                <img class="object-fit-cover w-100 h-100" src="<?= 'data:' , $listaImagemNoticia[$indice]->tipo , ';base64,', base64_encode($listaImagemNoticia[$indice]->dados) ?>">
+                                <img class="object-fit-cover w-100 h-100" src="<?= 'data:' , $noticia->tipo , ';base64,', base64_encode($noticia->dados) ?>">
                             </div>
                                                         
                         </div>
